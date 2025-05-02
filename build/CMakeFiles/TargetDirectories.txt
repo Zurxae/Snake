@@ -1,0 +1,8 @@
+/home/dev/projects/snake/build/CMakeFiles/rebuild_cache.dir
+/home/dev/projects/snake/build/CMakeFiles/edit_cache.dir
+/home/dev/projects/snake/build/CMakeFiles/snake.dir
+/home/dev/projects/snake/build/vendored/SDL/CMakeFiles/rebuild_cache.dir
+/home/dev/projects/snake/build/vendored/SDL/CMakeFiles/edit_cache.dir
+/home/dev/projects/snake/build/vendored/SDL/CMakeFiles/SDL_uclibc.dir
+/home/dev/projects/snake/build/vendored/SDL/CMakeFiles/SDL3_test.dir
+/home/dev/projects/snake/build/vendored/SDL/CMakeFiles/SDL3-shared.dir

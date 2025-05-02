@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/snake.dir/barebones.cpp.o -o snake  -Wl,-rpath,/home/dev/projects/snake/build libSDL3.so.0.3.0 
