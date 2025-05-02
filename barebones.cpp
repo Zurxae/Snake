@@ -118,12 +118,12 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     // gameState->grid[randRow][randCol] = FOOD;
     gameState->spawnFood = true;
 
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLUMNS; j++) {
-            std::cout << gameState->grid[i][j];
-        }
-        std::cout << std::endl;
-    }
+    // for (int i = 0; i < ROWS; i++) {
+    //     for (int j = 0; j < COLUMNS; j++) {
+    //         std::cout << gameState->grid[i][j];
+    //     }
+    //     std::cout << std::endl;
+    // }
 
     gameState->playerDirection = 0;
     gameState->lastMoveTime = 0;
@@ -160,13 +160,13 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                     gameState->playerDirection = LEFT;
                     break;
             }
-            for (int i = 0; i < ROWS; i++) {
-                for (int j = 0; j < COLUMNS; j++) {
-                    std::cout << gameState->grid[i][j];
-                }
-                std::cout << std::endl;
-            }
-            std::cout << std::endl << std::endl << std::endl << std::endl;
+            // for (int i = 0; i < ROWS; i++) {
+            //     for (int j = 0; j < COLUMNS; j++) {
+            //         std::cout << gameState->grid[i][j];
+            //     }
+            //     std::cout << std::endl;
+            // }
+            // std::cout << std::endl << std::endl << std::endl << std::endl;
             break;
     }
 
@@ -191,64 +191,36 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
         int tailRow = gameState->snakeBody.front().first;
         int tailColumn = gameState->snakeBody.front().second;
 
+        int dRow = 0;
+        int dCol = 0;
+
         switch (gameState->playerDirection) {
-            case UP:
-                if (headRow <= 0) {
-                    gameState->playerDirection = 0;
-                } else {
-                    gameState->grid[tailRow][tailColumn] = EMPTY;
-                    gameState->snakeBody.pop();
-                    headRow--;
-                    if (gameState->grid[headRow][headColumn] == FOOD) {
-                        gameState->spawnFood = true;
-                    }
-                    gameState->grid[headRow][headColumn] = SNAKE;
-                    gameState->snakeBody.push({headRow, headColumn});
-                }
-                break;
-            case RIGHT:
-                if (headColumn >= COLUMNS - 1) {
-                    gameState->playerDirection = 0;
-                } else {
-                    gameState->grid[tailRow][tailColumn] = EMPTY;
-                    gameState->snakeBody.pop();
-                    headColumn++;
-                    if (gameState->grid[headRow][headColumn] == FOOD) {
-                        gameState->spawnFood = true;
-                    }
-                    gameState->grid[headRow][headColumn] = SNAKE;
-                    gameState->snakeBody.push({headRow, headColumn});
-                }
-                break;
-            case DOWN:
-                if (headRow >= ROWS - 1) {
-                    gameState->playerDirection = 0;
-                } else {
-                    gameState->grid[tailRow][tailColumn] = EMPTY;
-                    gameState->snakeBody.pop();
-                    headRow++;
-                    if (gameState->grid[headRow][headColumn] == FOOD) {
-                        gameState->spawnFood = true;
-                    }
-                    gameState->grid[headRow][headColumn] = SNAKE;
-                    gameState->snakeBody.push({headRow, headColumn});
-                }
-                break;
-            case LEFT:
-                if (headColumn <= 0) {
-                    gameState->playerDirection = 0;
-                } else {
-                    gameState->grid[tailRow][tailColumn] = EMPTY;
-                    gameState->snakeBody.pop();
-                    headColumn--;
-                    if (gameState->grid[headRow][headColumn] == FOOD) {
-                        gameState->spawnFood = true;
-                    }
-                    gameState->grid[headRow][headColumn] = SNAKE;
-                    gameState->snakeBody.push({headRow, headColumn});
-                }
-                break;
+            case UP: dRow = -1; break;
+            case DOWN: dRow = 1; break;
+            case LEFT: dCol = -1; break;
+            case RIGHT: dCol = 1; break;
+            default:
+                gameState->playerDirection = 0;
+                return SDL_APP_CONTINUE;
         }
+
+        int newRow = headRow + dRow;
+        int newCol = headColumn + dCol;
+
+        if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLUMNS) {
+            gameState->playerDirection = 0;
+            return SDL_APP_CONTINUE;
+        }
+
+        gameState->grid[tailRow][tailColumn] = EMPTY;
+        gameState->snakeBody.pop();
+
+        if (gameState->grid[newRow][newCol] == FOOD) {
+            gameState->spawnFood = true;
+        }
+
+        gameState->grid[newRow][newCol] = SNAKE;
+        gameState->snakeBody.push({newRow, newCol});
     }
 
     int randRow;
