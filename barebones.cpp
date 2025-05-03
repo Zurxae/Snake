@@ -12,11 +12,6 @@ const std::string title = "Snake";
 constexpr int WINDOW_WIDTH = 640;
 constexpr int WINDOW_HEIGHT = 480;
 
-constexpr int ROWS = 30;
-constexpr int COLUMNS = 30;
-constexpr int ROWSIZE = WINDOW_HEIGHT / ROWS;
-constexpr int COLUMNSIZE = WINDOW_WIDTH / COLUMNS;
-
 constexpr int EMPTY = 0;
 constexpr int SNAKE = 1;
 constexpr int FOOD = 2;
@@ -38,9 +33,9 @@ int getRandomInt(int min, int max) {
     return distr(gen);
 }
 
-void logGrid(int** grid) {
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLUMNS; j++) {
+void logGrid(int** grid, int rows, int columns) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
             std::cout << grid[i][j];
         }
         std::cout << std::endl;
@@ -61,7 +56,7 @@ struct GameState {
 
     ~GameState() {
         if (grid) {
-            for (int i = 0; i < ROWS; i++) {
+            for (int i = 0; i < rows; i++) {
                 delete[] grid[i];
             }
             delete[] grid;
@@ -107,18 +102,21 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
     SDL_SetWindowPosition(gameState->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
 
-    gameState->grid = new int*[ROWS];
-    for (int i = 0; i < ROWS; i++) {
-        gameState->grid[i] = new int[COLUMNS];
+    gameState->rows = std::stoi(argv[1]);
+    gameState->columns = std::stoi(argv[2]);
+
+    gameState->grid = new int*[gameState->rows];
+    for (int i = 0; i < gameState->rows; i++) {
+        gameState->grid[i] = new int[gameState->columns];
     }
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLUMNS; j++) {
+    for (int i = 0; i < gameState->rows; i++) {
+        for (int j = 0; j < gameState->columns; j++) {
             gameState->grid[i][j] = EMPTY;
         }
     }
 
     for (int i = 0; i < 2 ; i++) {
-        gameState->snakeBody.push({(ROWS / 2), (COLUMNS / 2)-i});
+        gameState->snakeBody.push({(gameState->rows / 2), (gameState->columns / 2)-i});
         gameState->grid[gameState->snakeBody.back().first][gameState->snakeBody.back().second] = SNAKE;
     }
 
@@ -198,7 +196,7 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
         int newRow = headRow + dRow;
         int newCol = headColumn + dCol;
 
-        if (newRow < 0 || newRow >= ROWS || newCol < 0 || newCol >= COLUMNS) {
+        if (newRow < 0 || newRow >= gameState->rows || newCol < 0 || newCol >= gameState->columns) {
             gameState->playerDirection = 0;
             return SDL_APP_CONTINUE;
         }
@@ -219,8 +217,8 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     int tries = 0;
     if (gameState->spawnFood) {
         do {
-            randRow = getRandomInt(0, ROWS - 1);
-            randCol = getRandomInt(0, COLUMNS - 1);
+            randRow = getRandomInt(0, gameState->rows - 1);
+            randCol = getRandomInt(0, gameState->columns - 1);
             tries++;
         } while (gameState->grid[randRow][randCol] == SNAKE);
         gameState->grid[randRow][randCol] = FOOD;
@@ -234,14 +232,14 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     SDL_FRect tile;
     int r, g, b;
     float x, y;
-    float w = (float)COLUMNSIZE;
-    float h = (float)ROWSIZE;
+    float w = (float)(WINDOW_WIDTH / gameState->columns);
+    float h = (float)(WINDOW_HEIGHT / gameState->rows);
     int tileValue;
     
-    for (int i = 0; i < ROWS; i++) {
-        for (int j = 0; j < COLUMNS; j++) {
-            x = (float)(j * COLUMNSIZE);
-            y = (float)(i * ROWSIZE);
+    for (int i = 0; i < gameState->rows; i++) {
+        for (int j = 0; j < gameState->columns; j++) {
+            x = (float)(j * w);
+            y = (float)(i * h);
 
             tile = {x, y, w, h};
 
