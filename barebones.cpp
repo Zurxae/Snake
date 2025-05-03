@@ -38,6 +38,16 @@ int getRandomInt(int min, int max) {
     return distr(gen);
 }
 
+void logGrid(int** grid) {
+    for (int i = 0; i < ROWS; i++) {
+        for (int j = 0; j < COLUMNS; j++) {
+            std::cout << grid[i][j];
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl << std::endl;
+}
+
 struct GameState {
     int** grid;
     int playerDirection;
@@ -99,32 +109,13 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
             gameState->grid[i][j] = EMPTY;
         }
     }
-    // gameState->snakeBody.push({ROWS / 2, COLUMNS / 2});
-    // gameState->grid[gameState->snakeBody.back().first][gameState->snakeBody.back().second] = SNAKE;
 
-    //
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i <= ROWS / 2 ; i++) {
         gameState->snakeBody.push({(ROWS / 2), (COLUMNS / 2)-i});
         gameState->grid[gameState->snakeBody.back().first][gameState->snakeBody.back().second] = SNAKE;
     }
-    //
 
-    // int randRow;
-    // int randCol;
-    // do {
-    //     randRow = getRandomInt(0, ROWS - 1);
-    //     randCol = getRandomInt(0, COLUMNS - 1);
-    // } while (gameState->grid[randRow][randCol] == SNAKE);
-    // gameState->grid[randRow][randCol] = FOOD;
     gameState->spawnFood = true;
-
-    // for (int i = 0; i < ROWS; i++) {
-    //     for (int j = 0; j < COLUMNS; j++) {
-    //         std::cout << gameState->grid[i][j];
-    //     }
-    //     std::cout << std::endl;
-    // }
-
     gameState->playerDirection = 0;
     gameState->lastMoveTime = 0;
 
@@ -160,13 +151,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
                     gameState->playerDirection = LEFT;
                     break;
             }
-            // for (int i = 0; i < ROWS; i++) {
-            //     for (int j = 0; j < COLUMNS; j++) {
-            //         std::cout << gameState->grid[i][j];
-            //     }
-            //     std::cout << std::endl;
-            // }
-            // std::cout << std::endl << std::endl << std::endl << std::endl;
             break;
     }
 
@@ -225,13 +209,16 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
 
     int randRow;
     int randCol;
+    int tries = 0;
     if (gameState->spawnFood) {
         do {
             randRow = getRandomInt(0, ROWS - 1);
             randCol = getRandomInt(0, COLUMNS - 1);
+            tries++;
         } while (gameState->grid[randRow][randCol] == SNAKE);
         gameState->grid[randRow][randCol] = FOOD;
         gameState->spawnFood = false;
+        std::cout << "tries to place food: " << tries << std::endl;
     }
 
     SDL_SetRenderDrawColor(gameState->renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
@@ -289,7 +276,6 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
     }
 
     SDL_RenderPresent(gameState->renderer);
-    // SDL_Delay(1000);
     return SDL_APP_CONTINUE;
 }
 
