@@ -49,6 +49,8 @@ void logGrid(int** grid) {
 }
 
 struct GameState {
+    int rows;
+    int columns;
     int** grid;
     int playerDirection;
     std::queue<std::pair<int, int>> snakeBody;
@@ -75,6 +77,11 @@ struct GameState {
 
 SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
 
+    if (argc < 3) {
+        SDL_Log("Please enter ROW and COLUMN count values");
+        return SDL_APP_FAILURE;
+    }
+
     GameState* gameState = new GameState();
     *appstate = gameState;
 
@@ -99,7 +106,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
     }
 
     SDL_SetWindowPosition(gameState->window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
-    
+
     gameState->grid = new int*[ROWS];
     for (int i = 0; i < ROWS; i++) {
         gameState->grid[i] = new int[COLUMNS];
@@ -110,7 +117,7 @@ SDL_AppResult SDL_AppInit(void** appstate, int argc, char* argv[]) {
         }
     }
 
-    for (int i = 0; i <= ROWS / 2 ; i++) {
+    for (int i = 0; i < 2 ; i++) {
         gameState->snakeBody.push({(ROWS / 2), (COLUMNS / 2)-i});
         gameState->grid[gameState->snakeBody.back().first][gameState->snakeBody.back().second] = SNAKE;
     }
@@ -196,11 +203,11 @@ SDL_AppResult SDL_AppIterate(void* appstate) {
             return SDL_APP_CONTINUE;
         }
 
-        gameState->grid[tailRow][tailColumn] = EMPTY;
-        gameState->snakeBody.pop();
-
         if (gameState->grid[newRow][newCol] == FOOD) {
             gameState->spawnFood = true;
+        } else {
+            gameState->grid[tailRow][tailColumn] = EMPTY;
+            gameState->snakeBody.pop();
         }
 
         gameState->grid[newRow][newCol] = SNAKE;
