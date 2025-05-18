@@ -12,6 +12,14 @@ enum class TileType : uint8_t {
     Food
 };
 
+enum class MoveDirection : uint8_t {
+    NONE,
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
+};
+
 class SnakeGame {
 public:
     SnakeGame(const int window_width, const int window_height, const int rows, const int cols);
@@ -23,6 +31,7 @@ public:
     void updateGameState();
     void drawGrid();
     void drawTile(TileType tileType, float x, float y, bool isHead);
+    void setDirection(SDL_Scancode moveDirection);
     void moveSnake();
 
     bool restartGame = true;
@@ -37,6 +46,9 @@ private:
     std::vector<std::vector<TileType>> grid;
     std::queue<std::pair<int, int>> snakeBody;
     std::pair<int, int> snakeHead;
+    MoveDirection snakeDirection = MoveDirection::NONE;
+    Uint64 lastMoveTime;
+    bool spawnFood = true;
 };
 
 #endif

@@ -55,24 +55,31 @@ void SnakeGame::setGame() {
     int initSnakeLength = 2;
     for (int i = 0; i < initSnakeLength; i++) {
         int row = rows / 2;
-        int col = (cols / 2) - i - 1;
+        int col = (cols / 2) - i;
         snakeBody.push({row, col});
         grid[row][col] = TileType::Snake;
-
-        // Initialize snake head
-        if (i == 0) {
-            snakeHead = {row, col};
-        }
     }
+    snakeHead = snakeBody.back();
 
     restartGame = false;
 }
 
 void SnakeGame::updateGameState() {
+    // Check if game needs to be reset
     if (restartGame) {
         setGame();
+    }    
+
+    // Check if snake should move
+    constexpr Uint64 moveDelay = 100;
+    Uint64 now = SDL_GetTicks();
+
+    if (now > lastMoveTime + moveDelay) {
+        lastMoveTime = now;
+        // moveSnake();
     }
 
+    // Draw
     drawGrid();
 }
 
@@ -132,6 +139,58 @@ void SnakeGame::drawTile(TileType tileType, float x, float y, bool isHead) {
     }
 }
 
-void SnakeGame::moveSnake() {
+void SnakeGame::setDirection(SDL_Scancode moveDirection) {
+    switch (moveDirection) {
+        case SDL_SCANCODE_UP:
+            snakeDirection = MoveDirection::UP;
+            break;
+        case SDL_SCANCODE_RIGHT:
+            snakeDirection = MoveDirection::RIGHT;
+            break;
+        case SDL_SCANCODE_DOWN:
+            snakeDirection = MoveDirection::DOWN;
+            break;
+        case SDL_SCANCODE_LEFT:
+            snakeDirection = MoveDirection::LEFT;
+            break;
+    }
+}
 
+void SnakeGame::moveSnake() {
+    int headRow = snakeHead.first;
+    int headColumn = snakeHead.second;
+    int tailRow = snakeBody.front().first;
+    int tailColumn = snakeBody.front().second;
+
+    int dRow = 0;
+    int dCol = 0;
+
+    switch (snakeDirection) {
+        case MoveDirection::UP: dRow = -1; break;
+        case MoveDirection::DOWN: dRow = 1; break;
+        case MoveDirection::LEFT: dCol = -1; break;
+        case MoveDirection::RIGHT: dCol = 1; break;
+        default:
+            snakeDirection = MoveDirection::NONE;
+            return;
+    }
+
+    int newRow = headRow + dRow;
+    int newCol = headColumn + dCol;
+
+    if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
+        snakeDirection = MoveDirection::NONE;
+        return;
+    }
+
+    if (grid[newRow][newCol] == TileType::Food) {
+        spawnFood = true;
+    } else {
+        grid[tailRow][tailColumn] = TileType::Empty;
+        snakeBody.pop();
+    }
+
+    grid[newRow][newCol] = TileType::Snake;
+    snakeBody.push({newRow, newCol});
+    snakeHead = snakeBody.back();
 }

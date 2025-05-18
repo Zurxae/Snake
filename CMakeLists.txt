@@ -11,6 +11,7 @@ add_subdirectory(vendored/SDL EXCLUDE_FROM_ALL)
 
 # Create your game executable target as usual
 add_executable(snake WIN32 main.cpp SDLWindow.cpp SnakeGame.cpp)
+# add_executable(snake WIN32 barebones.cpp)
 
 # Link to the actual SDL3 library.
 target_link_libraries(snake PRIVATE SDL3::SDL3)
