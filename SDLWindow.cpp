@@ -1,7 +1,7 @@
 #include "SDLWindow.hpp"
 
 SDLWindow::SDLWindow(const std::string& title, int width, int height)
-    : window(nullptr), renderer(nullptr), initialized(false) {
+    : window(nullptr), renderer(nullptr) {
 
     if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("Couldn't initialize SDL: %s", SDL_GetError());
@@ -26,6 +26,7 @@ SDLWindow::SDLWindow(const std::string& title, int width, int height)
     SDL_ShowWindow(window);
 
     initialized = true;
+    SDL_Log("SDLWindow initialized");
 }
 
 SDLWindow::~SDLWindow() {
@@ -38,6 +39,8 @@ SDLWindow::~SDLWindow() {
         SDL_DestroyWindow(window);
     }
     SDL_Quit();
+
+    SDL_Log("Deleted SDLWindow");
 }
 
 bool SDLWindow::isInitialized() const {
