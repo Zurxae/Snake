@@ -1,6 +1,7 @@
 #ifndef SNAKE_HPP
 #define SNAKE_HPP
 
+#include <random>
 #include <queue>
 #include <vector>
 #include <SDL3/SDL.h>
@@ -33,6 +34,7 @@ public:
     void drawTile(TileType tileType, float x, float y, bool isHead);
     void setDirection(SDL_Scancode moveDirection);
     void moveSnake();
+    void placeFood();
 
     bool restartGame = true;
 

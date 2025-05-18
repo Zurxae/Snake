@@ -1,5 +1,8 @@
-#include <iostream>
 #include "SnakeGame.hpp"
+
+// Random number generator setup (global)
+std::random_device rd;
+std::mt19937 gen(rd());
 
 SnakeGame::SnakeGame(const int window_width, const int window_height, const int rows, const int cols)
     : rows(rows), cols(cols) {
@@ -55,11 +58,13 @@ void SnakeGame::setGame() {
     int initSnakeLength = 2;
     for (int i = 0; i < initSnakeLength; i++) {
         int row = rows / 2;
-        int col = (cols / 2) - i;
+        int col = (cols / 2) + i - 2;
         snakeBody.push({row, col});
         grid[row][col] = TileType::Snake;
     }
     snakeHead = snakeBody.back();
+    snakeDirection = MoveDirection::NONE;
+    spawnFood = true;
 
     restartGame = false;
 }
@@ -70,13 +75,15 @@ void SnakeGame::updateGameState() {
         setGame();
     }    
 
+    placeFood();
+
     // Check if snake should move
     constexpr Uint64 moveDelay = 100;
     Uint64 now = SDL_GetTicks();
 
     if (now > lastMoveTime + moveDelay) {
         lastMoveTime = now;
-        // moveSnake();
+        moveSnake();
     }
 
     // Draw
@@ -178,8 +185,11 @@ void SnakeGame::moveSnake() {
     int newRow = headRow + dRow;
     int newCol = headColumn + dCol;
 
-    if (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) {
-        snakeDirection = MoveDirection::NONE;
+    if (
+        (newRow < 0 || newRow >= rows || newCol < 0 || newCol >= cols) ||
+        (grid[newRow][newCol] == TileType::Snake)
+    ) {
+        restartGame = true;
         return;
     }
 
@@ -193,4 +203,26 @@ void SnakeGame::moveSnake() {
     grid[newRow][newCol] = TileType::Snake;
     snakeBody.push({newRow, newCol});
     snakeHead = snakeBody.back();
+}
+
+// Function to get random integer between min and max (inclusive)
+int getRandomInt(int min, int max) {
+    std::uniform_int_distribution<> distr(min, max);
+    return distr(gen);
+}
+
+void SnakeGame::placeFood() {
+    int randRow;
+    int randCol;
+    int tries = 0;
+    if (spawnFood) {
+        do {
+            randRow = getRandomInt(0, rows - 1);
+            randCol = getRandomInt(0, cols - 1);
+            tries++;
+        } while (grid[randRow][randCol] == TileType::Snake);
+        grid[randRow][randCol] = TileType::Food;
+        spawnFood = false;
+        SDL_Log("tries to place food: %d", tries);
+    }
 }
