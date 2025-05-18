@@ -56,10 +56,6 @@ SDL_AppResult SDL_AppEvent(void* appstate, SDL_Event* event) {
 SDL_AppResult SDL_AppIterate(void* appstate) {
     AppStates* state = static_cast<AppStates*>(appstate);
 
-    if (state->snakeGame->restartGame) {
-        state->snakeGame->setGame();
-    }
-
     state->snakeGame->updateGameState();
 
     return SDL_APP_CONTINUE;

@@ -22,7 +22,8 @@ public:
     void setGame();
     void updateGameState();
     void drawGrid();
-    void drawTile(TileType tileType, float x, float y);
+    void drawTile(TileType tileType, float x, float y, bool isHead);
+    void moveSnake();
 
     bool restartGame = true;
 
@@ -34,6 +35,8 @@ private:
     float w;
     float h;
     std::vector<std::vector<TileType>> grid;
+    std::queue<std::pair<int, int>> snakeBody;
+    std::pair<int, int> snakeHead;
 };
 
 #endif

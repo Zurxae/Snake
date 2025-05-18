@@ -47,10 +47,32 @@ void SnakeGame::setGame() {
         }
     }
 
+    // Set Snake
+    while (!snakeBody.empty()) {
+        snakeBody.pop();
+    }
+
+    int initSnakeLength = 2;
+    for (int i = 0; i < initSnakeLength; i++) {
+        int row = rows / 2;
+        int col = (cols / 2) - i - 1;
+        snakeBody.push({row, col});
+        grid[row][col] = TileType::Snake;
+
+        // Initialize snake head
+        if (i == 0) {
+            snakeHead = {row, col};
+        }
+    }
+
     restartGame = false;
 }
 
 void SnakeGame::updateGameState() {
+    if (restartGame) {
+        setGame();
+    }
+
     drawGrid();
 }
 
@@ -59,35 +81,33 @@ void SnakeGame::drawGrid() {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
     SDL_RenderClear(renderer);
     
-    int x, y;
-    TileType tileType;
-    
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-            x = (float)(j * w);
-            y = (float)(i * h);
-            tileType = grid[i][j];
-            
-            drawTile(tileType, x, y);
+            float x = (float)(j * w);
+            float y = (float)(i * h);
+            TileType tileType = grid[i][j];
+
+            bool isHead = (snakeHead.first == i && snakeHead.second == j);
+            drawTile(tileType, x, y, isHead);
         }
     }
     SDL_RenderPresent(renderer);
 }
 
-void SnakeGame::drawTile(TileType tileType, float x, float y) {
+void SnakeGame::drawTile(TileType tileType, float x, float y, bool isHead) {
     // Choose Color Based on tile type
     int r, g, b;
     
     switch (tileType) {
         case TileType::Empty:
-            r = 64;
-            g = 64;
-            b = 64;
+            r = 64; g = 64; b = 64;
             break;
         case TileType::Snake:
-            r = 0;
-            g = 255;
-            b = 0;
+            if (isHead) {
+                r = 34; g = 139; b = 34; // dark green
+            } else {
+                r = 0; g = 255; b = 0;
+            }
             break;
         case TileType::Food:
             r = 255;
@@ -110,4 +130,8 @@ void SnakeGame::drawTile(TileType tileType, float x, float y) {
     } else {
         SDL_RenderFillRect(renderer, &tile);
     }
+}
+
+void SnakeGame::moveSnake() {
+
 }
