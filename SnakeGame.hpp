@@ -51,6 +51,7 @@ private:
     MoveDirection snakeDirection = MoveDirection::NONE;
     Uint64 lastMoveTime;
     bool spawnFood = true;
+    bool gameStart = false;
 };
 
 #endif

@@ -63,8 +63,9 @@ void SnakeGame::setGame() {
         grid[row][col] = TileType::Snake;
     }
     snakeHead = snakeBody.back();
-    snakeDirection = MoveDirection::NONE;
+    snakeDirection = MoveDirection::RIGHT;
     spawnFood = true;
+    gameStart = false;
 
     restartGame = false;
 }
@@ -147,23 +148,37 @@ void SnakeGame::drawTile(TileType tileType, float x, float y, bool isHead) {
 }
 
 void SnakeGame::setDirection(SDL_Scancode moveDirection) {
+    gameStart = true;
+
     switch (moveDirection) {
         case SDL_SCANCODE_UP:
-            snakeDirection = MoveDirection::UP;
+            if (snakeDirection != MoveDirection::DOWN) {
+                snakeDirection = MoveDirection::UP;
+            }
             break;
         case SDL_SCANCODE_RIGHT:
-            snakeDirection = MoveDirection::RIGHT;
+            if (snakeDirection != MoveDirection::LEFT) {
+                snakeDirection = MoveDirection::RIGHT;
+            }
             break;
         case SDL_SCANCODE_DOWN:
-            snakeDirection = MoveDirection::DOWN;
+            if (snakeDirection != MoveDirection::UP) {
+                snakeDirection = MoveDirection::DOWN;
+            }
             break;
         case SDL_SCANCODE_LEFT:
-            snakeDirection = MoveDirection::LEFT;
+            if (snakeDirection != MoveDirection::RIGHT) {
+                snakeDirection = MoveDirection::LEFT;
+            }
             break;
     }
 }
 
 void SnakeGame::moveSnake() {
+    if (!gameStart) {
+        return;
+    }
+    
     int headRow = snakeHead.first;
     int headColumn = snakeHead.second;
     int tailRow = snakeBody.front().first;
